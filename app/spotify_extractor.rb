@@ -6,8 +6,7 @@ class SpotifyExtractor
     tracks = contents.map do |content| 
       SpotifyAdapter.get_track(content.chomp)
     end
-
-    tracks.each { |track| puts "#{track.artist_name} - #{track.name}" }
+    tracks
   end
 
 end
