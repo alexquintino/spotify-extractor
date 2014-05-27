@@ -1,17 +1,21 @@
-require 'net/http'
-require 'json'
 require_relative "spotify_response"
+require_relative "http_adapter"
+require 'json'
 
 class SpotifyAdapter
 
   LOOKUP_URL = "http://ws.spotify.com/lookup/1/.json"
   
   def self.get_track(id)
-    uri = URI(LOOKUP_URL)
-    params = {uri: id}
-    uri.query = URI.encode_www_form(params)
-    response = Net::HTTP.get_response(uri)
+    begin
+      response = HttpAdapter.get(LOOKUP_URL, {uri: id})
+    rescue NotFoundError
+      raise TrackNotFound.new("Couldn't find track #{id}")
+    end
+
     SpotifyResponse.for(JSON.parse(response.body))
   end
+end
 
+class TrackNotFound < StandardError
 end
