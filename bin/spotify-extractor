@@ -3,5 +3,6 @@
 require "pry"
 require_relative "../app/spotify_extractor"
 
-tracks = SpotifyExtractor.extract(ARGV[0])
-tracks.each { |track| puts "#{track.artist_name} - #{track.name}" }
+SpotifyExtractor.extract(ARGV[0]) do |track|
+  puts "#{track.artist_name} - #{track.name}"
+end
