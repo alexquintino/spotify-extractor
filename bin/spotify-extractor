@@ -3,6 +3,4 @@
 require "pry"
 require_relative "../app/spotify_extractor"
 
-SpotifyExtractor.extract(ARGV[0]) do |track|
-  puts "#{track.artist_name} - #{track.name}"
-end
+SpotifyExtractor.new.extract(ARGV[0])
