@@ -10,7 +10,7 @@ class SpotifyExtractor
     contents = File.readlines(filename)
     contents = contents.map(&:chomp)
     @spotify.get_tracks(contents) do |track|
-      puts "#{track.artist_name} - #{track.name}"
+      puts "#{track.artists.first.name} - #{track.name}"
     end
   end
 
