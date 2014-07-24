@@ -4,7 +4,9 @@ class SpotifyAdapter
 
   def get_tracks(track_ids)
     track_ids.each do |spotify_track_id|
-      id = spotify_track_id.split(":")[2] # alphanumeric part
+      parts = spotify_track_id.split(":")
+      next if parts[1] == "local" # skip local tracks
+      id = parts[2] # alphanumeric part
       yield get_track(id)
     end
   end
