@@ -9,11 +9,23 @@ class SpotifyExtractor
   def extract(user_id: '')
     playlists = @spotify.users_playlists(user_id)
     playlists.each do |playlist|
-      puts "------------ #{playlist.name} -----------------"
-      @spotify.all_tracks_for_playlist(playlist).each do |track|
-        puts "#{track.artists.first.name} - #{track.name}"
+      puts "Fetching tracks for playlist: #{playlist.name}"
+      create_folder
+      File.open path(playlist.name), 'w+t' do |file|
+        @spotify.all_tracks_for_playlist(playlist).each do |track|
+          artists = track.artists.map(&:name).join(" & ")
+          file.puts "#{artists} - #{track.name}"
+        end
       end
     end
+  end
+
+  def path(playlist_name)
+    "output/" + playlist_name.downcase.gsub(' ', '_') + ".playlist"
+  end
+
+  def create_folder
+    FileUtils.mkdir_p("output")
   end
 
 end
