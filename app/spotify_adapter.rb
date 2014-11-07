@@ -2,22 +2,25 @@ require 'rspotify'
 
 class SpotifyAdapter
 
-  def get_tracks(track_ids)
-    track_ids.each do |spotify_track_id|
-      parts = spotify_track_id.split(":")
-      next if parts[1] == "local" # skip local tracks
-      id = parts[2] # alphanumeric part
-      yield get_track(id)
-    end
+  def initialize(client_id, client_secret)
+    RSpotify.authenticate(client_id, client_secret)
   end
 
-  private
+  def users_playlists(user_id)
+    RSpotify::User.find(user_id).playlists
+  end
 
-  def get_track(id)
-    begin
-      RSpotify::Track.find(id)
-    rescue RestClient::ResourceNotFound
-      raise TrackNotFound.new("Couldn't find track #{id}")
+  def all_tracks_for_playlist(playlist)
+    results = []
+    offset = 0
+    limit = 100
+    Enumerator.new do |yielder|
+      loop do
+        results = playlist.tracks(offset: offset, limit: limit)
+        results.each { |track| yielder.yield track}
+        offset += results.size
+        raise StopIteration if results.size < limit
+      end
     end
   end
 end

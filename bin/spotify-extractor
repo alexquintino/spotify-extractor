@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-
-require "pry"
+require "bundler/setup"
+Bundler.require(:default)
 require_relative "../app/spotify_extractor"
 
-SpotifyExtractor.new.extract(ARGV[0])
+SpotifyExtractor.new(client_id: ARGV[1], client_secret: ARGV[2]).extract(user_id: ARGV[0])
