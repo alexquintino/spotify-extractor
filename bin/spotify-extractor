@@ -22,6 +22,10 @@ OptionParser.new do |opts|
     options[:user_id] = uid
   end
 
+  opts.on_tail("--structured", "Prints the list in JSON format with some structure to it") do
+    options[:structured] = true
+  end
+
   opts.on_tail("-h", "--help", "Show this message") do
     puts opts
     exit
