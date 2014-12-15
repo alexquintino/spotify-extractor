@@ -2,11 +2,15 @@ require_relative "spotify_adapter"
 
 class SpotifyExtractor
 
-  def initialize(client_id: '', client_secret: '')
-    @spotify = SpotifyAdapter.new(client_id, client_secret)
+  def self.extract(options)
+    self.new(options).extract(options[:user_id])
   end
 
-  def extract(user_id: '')
+  def initialize(options)
+    @spotify = SpotifyAdapter.new(options[:client_id], options[:client_secret])
+  end
+
+  def extract(user_id)
     playlists = @spotify.users_playlists(user_id)
     playlists.each do |playlist|
       puts "Fetching tracks for playlist: #{playlist.name}"
@@ -17,6 +21,7 @@ class SpotifyExtractor
           file.puts "#{artists} - #{track.name}"
         end
       end
+      puts "Done! Check the output folder"
     end
   end
 

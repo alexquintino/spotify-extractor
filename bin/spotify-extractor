@@ -2,5 +2,32 @@
 require "bundler/setup"
 Bundler.require(:default)
 require_relative "../app/spotify_extractor"
+require 'optparse'
 
-SpotifyExtractor.new(client_id: ARGV[1], client_secret: ARGV[2]).extract(user_id: ARGV[0])
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: spotify-extractor [options]"
+
+  opts.on("--clientid CLIENT_ID") do |cid|
+    options[:client_id] = cid
+  end
+
+  opts.on("--clientsecret CLIENT_SECRET") do |cs|
+    options[:client_secret] = cs
+  end
+
+  opts.on("-u", "--userid USER_ID") do |uid|
+    options[:user_id] = uid
+  end
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+raise OptionParser::MissingArgument if options[:user_id].nil? || options[:client_id].nil? || options[:client_secret].nil?
+
+SpotifyExtractor.extract(options)
