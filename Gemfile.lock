@@ -1,20 +1,11 @@
-GIT
-  remote: https://github.com/alexquintino/rspotify.git
-  revision: d27382d8569a86f0e645ece66345ab199c9c5f6e
-  branch: add_support_for_starred_playlists
-  specs:
-    rspotify (1.5.1)
-      omniauth-oauth2 (~> 1.1)
-      rest_client (~> 1.7)
-
 GEM
   remote: https://rubygems.org/
   specs:
     coderay (1.1.0)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
-    hashie (3.3.1)
-    jwt (1.0.0)
+    hashie (3.3.2)
+    jwt (1.2.0)
     method_source (0.8.2)
     multi_json (1.10.1)
     multi_xml (0.5.5)
@@ -39,8 +30,11 @@ GEM
       method_source (~> 0.8)
       slop (~> 3.4)
     rack (1.5.2)
-    rest_client (1.8.1)
+    rest_client (1.8.2)
       netrc (~> 0.7.7)
+    rspotify (1.8.0)
+      omniauth-oauth2 (~> 1.1)
+      rest_client (~> 1.8)
     slop (3.5.0)
 
 PLATFORMS
@@ -48,4 +42,4 @@ PLATFORMS
 
 DEPENDENCIES
   pry
-  rspotify!
+  rspotify
