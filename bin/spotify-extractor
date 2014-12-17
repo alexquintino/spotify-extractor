@@ -22,6 +22,10 @@ OptionParser.new do |opts|
     options[:user_id] = uid
   end
 
+  opts.on_tail("--artists-only") do
+    options[:output] = :artists_only
+  end
+
   opts.on_tail("--structured", "Prints the list in JSON format with some structure to it") do
     options[:output] = :structured
   end
