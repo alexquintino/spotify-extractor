@@ -1,7 +1,14 @@
 require_relative "spotify_adapter"
+require_relative "outputs/simple_output"
+require_relative "outputs/structured_output"
 require "json"
 
 class SpotifyExtractor
+
+  OUTPUT_MAPPING = {
+    simple: SimpleOutput,
+    structured: StructuredOutput,
+  }
 
   def self.extract(options)
     self.new(options).extract
@@ -9,9 +16,8 @@ class SpotifyExtractor
 
   def initialize(options)
     @spotify = SpotifyAdapter.new(options[:client_id], options[:client_secret])
-    @output_type_method = options[:structured] ? self.method(:structured_output) : self.method(:simple_output)
+    @outputter = OUTPUT_MAPPING[options[:output]].new
     @user_id = options[:user_id]
-    @tracks = []
   end
 
   def extract
@@ -19,11 +25,12 @@ class SpotifyExtractor
     playlists.each do |playlist|
       puts "Fetching tracks for playlist: #{playlist.name}"
       create_folder
-      File.open file_name(playlist.name), 'w+t' do |file|
+      File.open filename(playlist.name), 'w+t' do |file|
+        @outputter.set_file(file)
         @spotify.all_tracks_for_playlist(playlist).each do |track|
-          handle_track(file, track)
+          @outputter.handle_track(track)
         end
-        finish(file)
+        @outputter.finalize
       end
     end
     puts "Done! Check the output folder"
@@ -33,34 +40,8 @@ class SpotifyExtractor
     FileUtils.mkdir_p("output")
   end
 
-  def file_name(playlist_name)
-    if simple_output?
-      "output/" + playlist_name.downcase.gsub(' ', '_') + ".playlist"
-    else
-      "output/" + playlist_name.downcase.gsub(' ', '_') + ".json"
-    end
+  def filename(playlist_name)
+    "output/" + @outputter.filename(playlist_name)
   end
 
-  def handle_track(file, track)
-    @output_type_method.call file, track
-  end
-
-  def simple_output?
-    @output_type_method.name == :simple_output
-  end
-
-  def structured_output(file, track)
-    @tracks << {artists: track.artists.map(&:name), name: track.name}
-  end
-
-  def simple_output(file, track)
-    artists = track.artists.map(&:name).join(" & ")
-    file.puts "#{artists} - #{track.name}"
-  end
-
-  def finish(file)
-    unless simple_output?
-      file.write(@tracks.to_json)
-    end
-  end
 end
