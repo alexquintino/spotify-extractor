@@ -1,11 +1,9 @@
 #!/usr/bin/env ruby
-require "bundler/setup"
-Bundler.require(:default)
-require_relative "../app/spotify_extractor"
+require "spotify_extractor"
 require 'optparse'
 
-
-options = {output: :simple}
+options = {output: :simple,
+           playlists: []}
 
 OptionParser.new do |opts|
   opts.banner = "Usage: spotify-extractor [options]"
@@ -22,7 +20,11 @@ OptionParser.new do |opts|
     options[:user_id] = uid
   end
 
-  opts.on_tail("--artists-only") do
+  opts.on("-p", "--playlist PLAYLIST", "Select the playlist for output") do |playlist|
+    options[:playlists] << playlist
+  end
+
+  opts.on_tail("--artists-only", "Outputs a list with all the artists") do
     options[:output] = :artists_only
   end
 
