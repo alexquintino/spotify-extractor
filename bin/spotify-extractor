@@ -32,6 +32,11 @@ OptionParser.new do |opts|
     options[:format] = :structured
   end
 
+  opts.on_tail("-s", "--save", "Write output into files") do
+    options[:output] = :file
+    options[:log] = :true
+  end
+
   opts.on_tail("-h", "--help", "Show this message") do
     puts opts
     exit

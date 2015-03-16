@@ -2,36 +2,25 @@ require "track_parser"
 
 class ArtistsOnlyFormat
 
-  def initialize(output_folder: "output")
-    @output = output_folder
+  def initialize
     @seen_list = []
   end
 
-  def filename(playlist)
-    "artists.list"
-  end
-
-  def handle_track(playlist, track)
-    open_file(playlist) if @file.nil?
+  def format(track)
     result = TrackParser::Parser.do({artists: track.artists.map(&:name), name: track.name})
-    result.artists.each { |artist| add(artist) }
-    result.featuring.each { |artist| add(artist) } if result.featuring
-    result.remixer.each { |artist| add(artist) } if result.remixer
+    all_artists(result).map { |artist| add(artist) }.compact
   end
 
   def add(artist)
-    if !@seen_list.include?(artist)
-      @seen_list << artist
-      @file.puts(artist)
+    downcased = artist.downcase
+    if !@seen_list.include?(downcased)
+      @seen_list << downcased
+      return artist
     end
   end
 
-  def open_file(playlist)
-    @file = File.open(@output + "/" +filename(playlist), 'a+t')
+  def all_artists(parsed_track)
+    (parsed_track.artists.to_a + parsed_track.featuring.to_a + parsed_track.remixer.to_a).compact
   end
 
-  def finalize
-    @file.close
-    @file = nil
-  end
 end

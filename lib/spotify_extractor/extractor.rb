@@ -2,6 +2,8 @@ require "spotify_extractor/formats/simple_format"
 require "spotify_extractor/formats/structured_format"
 require "spotify_extractor/formats/artists_only_format"
 require "spotify_extractor/spotify_adapter"
+require "spotify_extractor/file_outputter"
+require "spotify_extractor/results_outputter"
 
 module SpotifyExtractor
   class Extractor
@@ -13,25 +15,27 @@ module SpotifyExtractor
 
     def initialize(options)
       @spotify = SpotifyAdapter.new(options[:client_id], options[:client_secret])
-      @formatter = FORMAT_MAPPING[options[:format]].new(output_folder: "output")
+      @formatter = FORMAT_MAPPING[options[:format]].new
+      @outputter = options[:output] == :file ? FileOutputter.new(options[:format]) : ResultsOutputter.new
       @user_id = options[:user_id]
-      create_folder
+      @log = options[:log]
     end
 
     def extract
       playlists = @spotify.users_playlists(@user_id)
       playlists.each do |playlist|
-        puts "Fetching tracks for playlist: #{playlist.name}"
-        @spotify.all_tracks_for_playlist(playlist).each do |track|
-          @formatter.handle_track(playlist.name, track)
-        end
-        @formatter.finalize
+        log "Fetching tracks for playlist: #{playlist.name}"
+        tracks = @spotify
+          .all_tracks_for_playlist(playlist)
+          .map { |track| @formatter.format(track) }
+        @outputter.add(playlist.name, tracks)
       end
-      puts "Done! Check the output folder"
+      log "Done! Check the output folder"
+      @outputter.output
     end
 
-    def create_folder
-      FileUtils.mkdir_p("output")
+    def log(text)
+      puts text if @log
     end
   end
 end
