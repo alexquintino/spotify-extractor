@@ -2,7 +2,7 @@
 require "spotify_extractor"
 require 'optparse'
 
-options = {output: :simple,
+options = {format: :simple,
            playlists: []}
 
 OptionParser.new do |opts|
@@ -25,11 +25,11 @@ OptionParser.new do |opts|
   end
 
   opts.on_tail("--artists-only", "Outputs a list with all the artists") do
-    options[:output] = :artists_only
+    options[:format] = :artists_only
   end
 
-  opts.on_tail("--structured", "Prints the list in JSON format with some structure to it") do
-    options[:output] = :structured
+  opts.on_tail("--structured", "Outputs the list in JSON format with some structure to it") do
+    options[:format] = :structured
   end
 
   opts.on_tail("-h", "--help", "Show this message") do

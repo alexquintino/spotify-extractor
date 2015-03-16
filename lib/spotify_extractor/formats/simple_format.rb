@@ -1,4 +1,4 @@
-class SimpleOutput
+class SimpleFormat
 
   def initialize(output_folder: "output")
     @output = output_folder

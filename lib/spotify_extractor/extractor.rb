@@ -1,20 +1,19 @@
-require "spotify_extractor/outputs/simple_output"
-require "spotify_extractor/outputs/structured_output"
-require "spotify_extractor/outputs/artists_only_output"
+require "spotify_extractor/formats/simple_format"
+require "spotify_extractor/formats/structured_format"
+require "spotify_extractor/formats/artists_only_format"
 require "spotify_extractor/spotify_adapter"
 
 module SpotifyExtractor
   class Extractor
-    OUTPUT_MAPPING = {
-      simple: SimpleOutput,
-      structured: StructuredOutput,
-      artists_only: ArtistsOnlyOutput
+    FORMAT_MAPPING = {
+      simple: SimpleFormat,
+      structured: StructuredFormat,
+      artists_only: ArtistsOnlyFormat
     }
-
 
     def initialize(options)
       @spotify = SpotifyAdapter.new(options[:client_id], options[:client_secret])
-      @outputter = OUTPUT_MAPPING[options[:output]].new(output_folder: "output")
+      @formatter = FORMAT_MAPPING[options[:format]].new(output_folder: "output")
       @user_id = options[:user_id]
       create_folder
     end
@@ -24,9 +23,9 @@ module SpotifyExtractor
       playlists.each do |playlist|
         puts "Fetching tracks for playlist: #{playlist.name}"
         @spotify.all_tracks_for_playlist(playlist).each do |track|
-          @outputter.handle_track(playlist.name, track)
+          @formatter.handle_track(playlist.name, track)
         end
-        @outputter.finalize
+        @formatter.finalize
       end
       puts "Done! Check the output folder"
     end

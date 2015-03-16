@@ -1,6 +1,6 @@
 require "track_parser"
 
-class ArtistsOnlyOutput
+class ArtistsOnlyFormat
 
   def initialize(output_folder: "output")
     @output = output_folder
