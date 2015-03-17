@@ -19,6 +19,7 @@ module SpotifyExtractor
       @outputter = options[:output] == :file ? FileOutputter.new(options[:format]) : ResultsOutputter.new
       @user_id = options[:user_id]
       @log = options[:log]
+      @selected_playlists = options[:playlists]
     end
 
     def extract_playlists
@@ -26,7 +27,7 @@ module SpotifyExtractor
     end
 
     def extract
-      playlists = @spotify.users_playlists(@user_id)
+      playlists = filter(@spotify.users_playlists(@user_id))
       playlists.each do |playlist|
         log "Fetching tracks for playlist: #{playlist.name}"
         tracks = @spotify
@@ -38,8 +39,18 @@ module SpotifyExtractor
       return @outputter.output
     end
 
+    private
+    def filter(playlists)
+      if !@selected_playlists.nil?
+        playlists.select { |p| @selected_playlists.include?(p.name) }
+      else
+        playlists
+      end
+    end
+
     def log(text)
       puts text if @log
     end
+
   end
 end
