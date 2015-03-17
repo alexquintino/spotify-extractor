@@ -21,6 +21,10 @@ module SpotifyExtractor
       @log = options[:log]
     end
 
+    def extract_playlists
+      playlists = @spotify.users_playlists(@user_id)
+    end
+
     def extract
       playlists = @spotify.users_playlists(@user_id)
       playlists.each do |playlist|
@@ -31,7 +35,7 @@ module SpotifyExtractor
         @outputter.add(playlist.name, tracks)
       end
       log "Done! Check the output folder"
-      @outputter.output
+      return @outputter.output
     end
 
     def log(text)
